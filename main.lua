@@ -6,6 +6,7 @@ require "pieceSpawner"
 require "action"
 require "shop"
 require "shopSpawner"
+require "mouse"
 io.stdout:setvbuf("no")
 
 function love.load()
@@ -15,6 +16,10 @@ function love.load()
   love.window.setMode(screenWidth, screenHeight)
   
   radius = 7
+  yGridStart = 55
+  yGridEnd = 470
+  xGridStart=60
+  xGridEnd=560
   -- makes hexGrid table
   makeGrid(radius)
   shops={}
