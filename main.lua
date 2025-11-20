@@ -18,8 +18,8 @@ function love.load()
   
   allies={}
   enemies={}
-  spawnAlly(0,0,"kenny")
-  spawnEnemy(7,7,"harold")
+  spawnAlly(0,0)
+  spawnEnemy(7,7)
 end
 local timeAccumulator = 0
 function love.update(dt)
@@ -33,7 +33,6 @@ function love.update(dt)
     for i, enemy in ipairs(enemies) do
       enemy:update()
     end
-    debug()
     for i, ally in ipairs(allies) do
       action(ally)
     end
@@ -59,20 +58,3 @@ for _, enemy in ipairs(enemies) do
 end
   end
   
-function debug()
-  print("--- DEBUG INFO ---")
-  for i, ally in ipairs(allies) do
-    if ally.target then
-      print("Ally target:", ally.target.name)
-    else
-      print("Ally target: none")
-    end
-  end
-  for i, enemy in ipairs(enemies) do
-    if enemy.target then
-      print("Enemy target:", enemy.target.name)
-    else
-      print("Enemy target: none")
-    end
-  end
-end

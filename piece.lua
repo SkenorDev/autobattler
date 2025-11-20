@@ -6,7 +6,7 @@ PieceClass.__index = PieceClass
 local pieceImage = love.graphics.newImage("Assets/Square.png")
 
 
-function PieceClass:new(x, y,name,team)
+function PieceClass:new(x, y,team)
     local piece = setmetatable({}, PieceClass)
      piece.x=x
      piece.y=y
@@ -14,7 +14,6 @@ function PieceClass:new(x, y,name,team)
      piece.scaleY = 0.025
      
      piece.team = team
-     piece.name= name
      piece.hp = 100
      piece.target = nil
     return piece
