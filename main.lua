@@ -15,11 +15,20 @@ function love.load()
   -- makes hexGrid table
   makeGrid(radius)
   
-  piece=spawnPiece(1,1)
+  allies={}
+  enemies={}
+  spawnAlly(0,0,"kenny")
+  spawnEnemy(7,7,"harold")
 end
 
 function love.update()
-  
+  for i, ally in ipairs(allies) do
+    ally:update()
+  end
+    for i, enemy in ipairs(enemies) do
+    enemy:update()
+  end
+  debug()
 end
 
 function love.draw()
@@ -29,6 +38,28 @@ function love.draw()
             hex:draw()
         end
     end
-  piece:draw()
+for _, ally in ipairs(allies) do
+  ally:draw()
+end
+for _, enemy in ipairs(enemies) do
+  enemy:draw()
+end
   end
   
+function debug()
+  print("--- DEBUG INFO ---")
+  for i, ally in ipairs(allies) do
+    if ally.target then
+      print("Ally target:", ally.target.name)
+    else
+      print("Ally target: none")
+    end
+  end
+  for i, enemy in ipairs(enemies) do
+    if enemy.target then
+      print("Enemy target:", enemy.target.name)
+    else
+      print("Enemy target: none")
+    end
+  end
+end
