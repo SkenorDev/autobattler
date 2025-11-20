@@ -3,6 +3,7 @@ require "hex"
 require "hexSpawner"
 require "piece"
 require "pieceSpawner"
+require "action"
 io.stdout:setvbuf("no")
 
 function love.load()
@@ -20,15 +21,27 @@ function love.load()
   spawnAlly(0,0,"kenny")
   spawnEnemy(7,7,"harold")
 end
+local timeAccumulator = 0
+function love.update(dt)
+  timeAccumulator = timeAccumulator + dt
 
-function love.update()
-  for i, ally in ipairs(allies) do
-    ally:update()
-  end
+  if timeAccumulator >= 2 then
+    -- Run your once-per-second logic:
+    for i, ally in ipairs(allies) do
+      ally:update()
+    end
     for i, enemy in ipairs(enemies) do
-    enemy:update()
+      enemy:update()
+    end
+    debug()
+    for i, ally in ipairs(allies) do
+      action(ally)
+    end
+    for i, enemy in ipairs(enemies) do
+       action(enemy)
+    end
+    timeAccumulator = timeAccumulator - 1
   end
-  debug()
 end
 
 function love.draw()
