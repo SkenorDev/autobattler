@@ -14,13 +14,11 @@ function spawnHex(x,y)
 end
     
 function makeGrid(radius)
-    hexGrid = {}
-    local width = radius + 1
-
+   hexGrid = {}
     for x = 0, radius do
+      hexGrid[x] = {}
         for y = 0, radius do
-            local index = x * width + y
-            hexGrid[index] = spawnHex(x, y)
+            hexGrid[x][y] = spawnHex(x, y)
         end
     end
 end

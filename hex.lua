@@ -3,7 +3,6 @@ require "vector"
 HexClass = {}
 HexClass.__index = HexClass 
 
--- Load image once, not per hex
 local hexImage = love.graphics.newImage("Assets/Hexagon-Blank.png")
 local HEX_WIDTH  = hexImage:getWidth()
 local HEX_HEIGHT = hexImage:getHeight()
