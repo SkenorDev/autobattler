@@ -4,6 +4,8 @@ require "hexSpawner"
 require "piece"
 require "pieceSpawner"
 require "action"
+require "shop"
+require "shopSpawner"
 io.stdout:setvbuf("no")
 
 function love.load()
@@ -15,11 +17,12 @@ function love.load()
   radius = 7
   -- makes hexGrid table
   makeGrid(radius)
-  
+  shops={}
   allies={}
   enemies={}
   spawnAlly(0,0)
   spawnEnemy(7,7)
+  createShop(1)
 end
 local timeAccumulator = 0
 function love.update(dt)
@@ -37,7 +40,7 @@ function love.update(dt)
       action(ally)
     end
     for i, enemy in ipairs(enemies) do
-       action(enemy)
+      action(enemy)
     end
     timeAccumulator = timeAccumulator - 1
   end
@@ -61,5 +64,8 @@ function love.draw()
   end
   for _, enemy in ipairs(enemies) do
     enemy:draw()
+  end
+  for _, shop in ipairs(shops) do
+    shop:draw()
   end
 end
