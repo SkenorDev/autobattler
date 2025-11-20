@@ -45,16 +45,21 @@ end
 
 function love.draw()
   love.graphics.clear(1, 1, 1)
+
+  local mouseX, mouseY = love.mouse.getPosition()
+  love.graphics.setColor(0, 0, 0)
+  love.graphics.print("Mouse: " .. mouseX .. ", " .. mouseY, 10, 10)
+
+  love.graphics.setColor(1, 1, 1)
   for x, column in pairs(hexGrid) do
-        for y, hex in pairs(column) do
-            hex:draw()
-        end
+    for y, hex in pairs(column) do
+      hex:draw()
     end
-for _, ally in ipairs(allies) do
-  ally:draw()
-end
-for _, enemy in ipairs(enemies) do
-  enemy:draw()
-end
   end
-  
+  for _, ally in ipairs(allies) do
+    ally:draw()
+  end
+  for _, enemy in ipairs(enemies) do
+    enemy:draw()
+  end
+end

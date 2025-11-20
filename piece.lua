@@ -31,6 +31,21 @@ function PieceClass:draw()
         self.scaleX,   -- x scale
         self.scaleY    -- y scale
     )
+  local barWidth = 40
+  local barHeight = 6
+  local barX = drawx 
+  local barY = drawy - 5
+
+  love.graphics.setColor(1, 0, 0) -- red color
+  love.graphics.rectangle("fill", barX, barY, barWidth, barHeight)
+
+  -- Draw the health bar foreground (green) proportional to HP
+  local hpPercentage = math.max(self.hp, 0) / 100 -- assuming max hp 100
+  love.graphics.setColor(0, 1, 0) -- green color
+  love.graphics.rectangle("fill", barX, barY, barWidth * hpPercentage, barHeight)
+
+  -- Reset color to white for other draw calls
+  love.graphics.setColor(1, 1, 1)
 end
 
 function PieceClass:update(dt)
