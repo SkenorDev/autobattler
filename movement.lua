@@ -13,3 +13,50 @@ function move(piece)
     piece.y=piece.y+1
     end
   end
+  
+function isNear(x,y,tx,ty)
+if ty % 2 ==1 then
+  if x==tx and y==ty-1 then
+    return true
+    end
+  if x==tx+1 and y==ty-1 then
+    return true
+  end
+    if x==tx+1 and y==ty then
+    return true
+  end
+      if x==tx+1 and y==ty+1 then
+    return true
+  end
+      if x==tx and y==ty+1 then
+    return true
+  end
+      if x==tx-1 and y==ty then
+    return true
+  end
+else
+  if x==tx-1 and y == ty -1 then
+    return true
+  end
+  if x==tx and y == ty -1 then
+    return true
+  end
+    if x==tx and y == ty +1 then
+    return true
+  end
+     if x==tx+1 and y == ty  then
+    return true
+  end
+       if x==tx and y == ty+1  then
+    return true
+  end
+      if x==tx-1 and y == ty+1  then
+    return true
+  end
+      if x==tx-1 and y == ty then
+    return true
+  end
+  end
+  return false
+  end
+  

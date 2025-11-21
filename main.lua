@@ -27,6 +27,7 @@ function love.load()
   enemies={}
   spawnAlly(0,0)
   spawnEnemy(7,7)
+  spawnEnemy(7,6)
   createShop(1)
 end
 local timeAccumulator = 0
