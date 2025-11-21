@@ -11,6 +11,8 @@ function HexClass:new(x, y,dx,dy)
     hex.y = y
     hex.dx= dx
     hex.dy= dy
+    hex.occupied = false
+    
     
     -- optional scale
     hex.scaleX = 0.1
