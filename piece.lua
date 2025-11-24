@@ -6,15 +6,17 @@ PieceClass.__index = PieceClass
 local pieceImage = love.graphics.newImage("Assets/Square.png")
 
 
-function PieceClass:new(x, y,range,team)
+function PieceClass:new(x, y,range,attack,hp,team)
     local piece = setmetatable({}, PieceClass)
      piece.x=x
      piece.y=y
      piece.scaleX = 0.025
      piece.scaleY = 0.025
      piece.range=range
+      piece.attack=attack
      piece.team = team
-     piece.hp = 100
+     piece.maxhp = hp
+     piece.hp = hp
      piece.target = nil
     return piece
 end
@@ -40,7 +42,7 @@ function PieceClass:draw()
   love.graphics.rectangle("fill", barX, barY, barWidth, barHeight)
 
   -- Draw the health bar foreground (green) proportional to HP
-  local hpPercentage = math.max(self.hp, 0) / 100 -- assuming max hp 100
+  local hpPercentage = math.max(self.hp, 0) / self.maxhp -- assuming max hp 100
   love.graphics.setColor(0, 1, 0) -- green color
   love.graphics.rectangle("fill", barX, barY, barWidth * hpPercentage, barHeight)
 

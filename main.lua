@@ -25,9 +25,8 @@ function love.load()
   shops={}
   allies={}
   enemies={}
-  spawnAlly(1,0,1)
-  spawnAlly(0,0,2)
-  spawnEnemy(7,7,1)
+  spawnAlly(1,0,1,1,10)
+  spawnEnemy(7,7,1,1,10)
   createShop(1)
 end
 local timeAccumulator = 0
