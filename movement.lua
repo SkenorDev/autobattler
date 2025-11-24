@@ -8,6 +8,8 @@ HEX_DIRECTIONS = {
 }
 function move(piece)
   target=piece.target
+  --TODO add range stat to pieces
+  if canAttack(piece.x,piece.y,target.x,target.y,piece.range) == false then 
   hex = hexGrid[piece.x][piece.y]
   hex.occupied =false
   if target.x+1<piece.x then
@@ -25,57 +27,10 @@ function move(piece)
   hex = hexGrid[piece.x][piece.y]
   hex.occupied =true
   end
-  
-function isNear(x,y,tx,ty)
-if ty % 2 ==1 then
-  if x==tx and y==ty-1 then
-    return true
-    end
-  if x==tx+1 and y==ty-1 then
-    return true
-  end
-    if x==tx+1 and y==ty then
-    return true
-  end
-      if x==tx+1 and y==ty+1 then
-    return true
-  end
-      if x==tx and y==ty+1 then
-    return true
-  end
-      if x==tx-1 and y==ty then
-    return true
-  end
-else
-  if x==tx-1 and y == ty -1 then
-    return true
-  end
-  if x==tx and y == ty -1 then
-    return true
-  end
-    if x==tx and y == ty +1 then
-    return true
-  end
-     if x==tx+1 and y == ty  then
-    return true
-  end
-       if x==tx and y == ty+1  then
-    return true
-  end
-      if x==tx-1 and y == ty+1  then
-    return true
-  end
-      if x==tx-1 and y == ty then
-    return true
-  end
-  end
-  return false
   end
   
-  function findPath(x,y,tx,ty)
-    
-    for i = 1, 6 do
-
-      end
-    
-    end
+function canAttack(x, y, tx, ty,range)
+local a = offsetToAxial(x, y)
+local b = offsetToAxial(tx, ty)
+return hexDistance(a, b) <= range
+end

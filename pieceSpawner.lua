@@ -1,20 +1,20 @@
 require "piece"
-function spawnPiece(x,y,team)
-     return PieceClass:new(x,y,team)
+function spawnPiece(x,y,range,team)
+     return PieceClass:new(x,y,range,team)
 end
 
-function spawnAlly(x,y)
+function spawnAlly(x,y,range)
     hex = hexGrid[x][y]
     if hex.occupied==false then
-  table.insert(allies, spawnPiece(x,y,0))
+  table.insert(allies, spawnPiece(x,y,range,0))
   hex.occupied=true
   end
 end
 
-function spawnEnemy(x,y)
+function spawnEnemy(x,y,range)
     hex = hexGrid[x][y]
     if hex.occupied==false then
-  table.insert(enemies, spawnPiece(x,y,1))
+  table.insert(enemies, spawnPiece(x,y,range,1))
   hex.occupied=true
   end
   end
