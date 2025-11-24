@@ -47,6 +47,18 @@ function love.update(dt)
     for i, enemy in ipairs(enemies) do
       action(enemy)
     end
+  for i = #allies, 1, -1 do
+  local ally = allies[i]
+  if ally.hp <= 0 then
+    table.remove(allies, i)
+  end
+end
+for i = #enemies, 1, -1 do
+  local enemy = enemies[i]
+  if enemy.hp <= 0 then
+    table.remove(enemies, i)
+  end
+end
     timeAccumulator = timeAccumulator - 1
   end
 end
