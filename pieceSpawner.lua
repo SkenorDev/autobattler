@@ -21,22 +21,22 @@ end
 --spawnEnemy(7,7,1,1,10)
 function spawnWarrior(x,y,team) 
   if team == 1 then
-    spawnEnemy(x,y,1,1,10,name,"Warrior")
+    spawnEnemy(x,y,1,25,500,"WarriorEnemy")
   else 
-    spawnAlly(x,y,1,1,10,name,"Warrior")
+    spawnAlly(x,y,1,25,500,"Warrior")
   end
 end
 function spawnArcher(x,y,team) 
   if team == 1 then
-    spawnEnemy(x,y,2,10,20,"Archer")
+    spawnEnemy(x,y,5,30,350,"ArcherEnemy")
   else 
-    spawnAlly(x,y,2,10,20,"Archer")
+    spawnAlly(x,y,5,30,350,"Archer")
   end
 end
 function spawnTank(x,y,team)
   if team == 1 then
-    spawnEnemy(x,y,1,2,100,"Tank")
+    spawnEnemy(x,y,1,10,800,"TankEnemy")
   else 
-    spawnAlly(x,y,1,2,100,"Tank")
+    spawnAlly(x,y,1,10,800,"Tank")
   end
 end

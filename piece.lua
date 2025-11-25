@@ -7,10 +7,16 @@ local pieceImage = love.graphics.newImage("Assets/Square.png")
 local WarriorImage = love.graphics.newImage("Assets/Warrior.png")
 local ArcherImage = love.graphics.newImage("Assets/Archer.png")
 local TankImage = love.graphics.newImage("Assets/Tank.png")
+local WarriorEnemyImage = love.graphics.newImage("Assets/Warrior_Enemy.png")
+local ArcherEnemyImage = love.graphics.newImage("Assets/Archer_Enemy.png")
+local TankEnemyImage = love.graphics.newImage("Assets/Tank_Enemy.png")
 local pieceImages = {
     Warrior = WarriorImage,
     Archer  = ArcherImage,
     Tank    = TankImage,
+    WarriorEnemy = WarriorEnemyImage,
+    ArcherEnemy  = ArcherEnemyImage,
+    TankEnemy    = TankEnemyImage,
 }
 function PieceClass:new(x, y,range,attack,hp,team,name)
     local piece = setmetatable({}, PieceClass)
