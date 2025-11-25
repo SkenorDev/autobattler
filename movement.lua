@@ -8,25 +8,43 @@ HEX_DIRECTIONS = {
 }
 function move(piece)
     local target = piece.target
+    if not target then return end
+
     local startAx = offsetToAxial(piece.x, piece.y)
     local goalAx  = offsetToAxial(target.x, target.y)
 
-    -- find best hex-direction to reduce distance
     local bestDir = nil
     local bestDist = math.huge
 
     for _, d in ipairs(HEX_DIRECTIONS) do
         local nq = startAx.q + d[1]
         local nr = startAx.r + d[2]
-        local dist = hexDistance({q=nq, r=nr}, goalAx)
 
-        if dist < bestDist then
-            bestDist = dist
-            bestDir = {q=nq, r=nr}
+        -- convert candidate back to offset coords
+        local candX = nq
+        local candY = nr + math.floor((nq + 1) / 2)
+
+        -- prevent going out of bounds
+        if candX >= 0 and candX <= 7 and candY >= 0 and candY <= 7 then
+            
+            -- OPTIONAL: prevent moving onto occupied hex
+            if not hexGrid[candX][candY].occupied then
+                
+                -- compute distance
+                local dist = hexDistance({q = nq, r = nr}, goalAx)
+                
+                if dist < bestDist then
+                    bestDist = dist
+                    bestDir = {q = nq, r = nr}
+                end
+            end
         end
     end
 
-    -- convert back to offset coords
+    -- no valid move found
+    if not bestDir then return end
+
+    -- convert direction to offset coords
     local newX = bestDir.q
     local newY = bestDir.r + math.floor((bestDir.q + 1) / 2)
 
@@ -36,7 +54,7 @@ function move(piece)
     piece.y = newY
     hexGrid[piece.x][piece.y].occupied = true
 end
-  
+
 function canAttack(x, y, tx, ty,range)
 local a = offsetToAxial(x, y)
 local b = offsetToAxial(tx, ty)

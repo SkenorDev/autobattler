@@ -1,3 +1,3 @@
-function createShop(x, piece)
-table.insert(shops, ShopClass:new(x, piece, screenWidth, screenHeight))
+function createShop(x, piece,name)
+table.insert(shops, ShopClass:new(x, piece, name,screenWidth, screenHeight))
 end

@@ -4,9 +4,15 @@ PieceClass = {}
 PieceClass.__index = PieceClass 
 
 local pieceImage = love.graphics.newImage("Assets/Square.png")
-
-
-function PieceClass:new(x, y,range,attack,hp,team)
+local WarriorImage = love.graphics.newImage("Assets/Warrior.png")
+local ArcherImage = love.graphics.newImage("Assets/Archer.png")
+local TankImage = love.graphics.newImage("Assets/Tank.png")
+local pieceImages = {
+    Warrior = WarriorImage,
+    Archer  = ArcherImage,
+    Tank    = TankImage,
+}
+function PieceClass:new(x, y,range,attack,hp,team,name)
     local piece = setmetatable({}, PieceClass)
      piece.x=x
      piece.y=y
@@ -15,18 +21,21 @@ function PieceClass:new(x, y,range,attack,hp,team)
      piece.range=range
       piece.attack=attack
      piece.team = team
+     piece.name = name
      piece.maxhp = hp
      piece.hp = hp
      piece.target = nil
+     piece.image = pieceImages[name] or pieceImage
     return piece
 end
 
 function PieceClass:draw()
+  
   local hexagonPos=hexGrid[self.x][self.y]
   local drawx=hexagonPos.dx +23
   local drawy=hexagonPos.dy +15
     love.graphics.draw(
-        pieceImage,  
+        self.image,  
         drawx,
         drawy,
         0,             -- rotation

@@ -1,12 +1,13 @@
 ShopClass = {}
 ShopClass.__index = ShopClass 
 
-function ShopClass:new(slotNumber,piece,windowWidth, windowHeight)
+function ShopClass:new(slotNumber,piece,name,windowWidth, windowHeight)
     local shop = setmetatable({}, ShopClass)
     shop.width = windowWidth * 0.20       -- 20% of window width
     shop.height = 120 
     shop.piece = piece
     shop.slot =slotNumber
+    shop.name =name
     shop.x = (slotNumber - 1) * shop.width  -- position based on slot number (0-indexed internally)
     shop.y = windowHeight - shop.height  -- bottom aligned
     return shop
@@ -19,7 +20,7 @@ function ShopClass:draw()
     
     -- Optional: draw slot number
     love.graphics.setColor(1,1,1,1)
-    love.graphics.print("Shop " .. tostring((self.x / self.width) + 1), self.x + 10, self.y + 10)
+    love.graphics.print(self.name, self.x + 10, self.y + 40)
 end
 
 function ShopClass:update(dt)

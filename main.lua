@@ -28,9 +28,9 @@ function love.load()
   enemies={}
   spawnWarrior(1,2,1)
   spawnWarrior(6,7,0)
-  createShop(1,spawnWarrior)
-  createShop(3,spawnArcher)
-  createShop(5,spawnTank)
+  createShop(1,spawnWarrior,"Warrior")
+  createShop(3,spawnArcher,"Archer")
+  createShop(5,spawnTank,"Tank")
 end
 local timeAccumulator = 0
 function love.update(dt)
