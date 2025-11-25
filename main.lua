@@ -23,11 +23,14 @@ function love.load()
   -- makes hexGrid table
   makeGrid(radius)
   shops={}
+  holder=nil
   allies={}
   enemies={}
-  spawnAlly(1,0,1,1,10)
-  spawnEnemy(7,7,1,1,10)
-  createShop(1)
+  spawnWarrior(1,2,1)
+  spawnWarrior(6,7,0)
+  createShop(1,spawnWarrior)
+  createShop(3,spawnArcher)
+  createShop(5,spawnTank)
 end
 local timeAccumulator = 0
 function love.update(dt)

@@ -8,8 +8,21 @@ local yGridEnd = 470
 
 local HEX_WIDTH = 60
 local HEX_HEIGHT = 70
+
 function love.mousereleased(x, y, button)
   print("Mouse released at:", x, y, "button:", button)
+  if button == 2 and y > yGridStart and y < yGridEnd and x > xGridStart and x < xGridEnd then
+    -- Convert mouse position relative to grid start
+    local relativeX = x - xGridStart
+    local relativeY = y - yGridStart
+    
+    local hexX, hexY = pixelToHex(relativeX, relativeY)
+    if hexX>-1 and hexX<8 and hexY>-1 and hexY<8 then
+    if holder then
+    holder(hexX, hexY,0)
+    end
+  end
+  end
   if button == 1 and y > yGridStart and y < yGridEnd and x > xGridStart and x < xGridEnd then
     -- Convert mouse position relative to grid start
     local relativeX = x - xGridStart
@@ -17,11 +30,18 @@ function love.mousereleased(x, y, button)
     
     local hexX, hexY = pixelToHex(relativeX, relativeY)
     if hexX>-1 and hexX<8 and hexY>-1 and hexY<8 then
-    spawnAlly(hexX,hexY)
+    if holder then
+    holder(hexX, hexY,1)
+    end
     end
     print("Clicked hex coordinates:", hexX, hexY)
   else
-    print("Click outside grid area.")
+    for i, shop in ipairs(shops) do
+      if button ==1 and y > shop.y-shop.height and x > shop.x-shop.width then
+        print("Clicked shop:", shop.slot)
+        holder = shop.piece
+        end
+      end
   end
 end
 

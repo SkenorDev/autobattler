@@ -7,24 +7,35 @@ HEX_DIRECTIONS = {
     { 0,  1 },  -- southeast
 }
 function move(piece)
-  target=piece.target
-  hex = hexGrid[piece.x][piece.y]
-  hex.occupied =false
-  if target.x+1<piece.x then
-    piece.x=piece.x-1
-  end
-    if target.x-1>piece.x then
-    piece.x=piece.x+1
-  end
-    if target.y+1<piece.y then
-    piece.y=piece.y-1
-  end
-    if target.y-1>piece.y then
-    piece.y=piece.y+1
-  end
-  hex = hexGrid[piece.x][piece.y]
-  hex.occupied =true
-  end
+    local target = piece.target
+    local startAx = offsetToAxial(piece.x, piece.y)
+    local goalAx  = offsetToAxial(target.x, target.y)
+
+    -- find best hex-direction to reduce distance
+    local bestDir = nil
+    local bestDist = math.huge
+
+    for _, d in ipairs(HEX_DIRECTIONS) do
+        local nq = startAx.q + d[1]
+        local nr = startAx.r + d[2]
+        local dist = hexDistance({q=nq, r=nr}, goalAx)
+
+        if dist < bestDist then
+            bestDist = dist
+            bestDir = {q=nq, r=nr}
+        end
+    end
+
+    -- convert back to offset coords
+    local newX = bestDir.q
+    local newY = bestDir.r + math.floor((bestDir.q + 1) / 2)
+
+    -- update occupancy
+    hexGrid[piece.x][piece.y].occupied = false
+    piece.x = newX
+    piece.y = newY
+    hexGrid[piece.x][piece.y].occupied = true
+end
   
 function canAttack(x, y, tx, ty,range)
 local a = offsetToAxial(x, y)

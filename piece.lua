@@ -58,6 +58,9 @@ function PieceClass:update(dt)
   end
 end
 function PieceClass:updateTargetEnemy()
+  if #allies == 0 then
+    return 
+    end
   if self.target ~= nil and self.target.hp <= 0 then
     self.target = nil
   end
@@ -80,6 +83,9 @@ function PieceClass:updateTargetEnemy()
 end
 
 function PieceClass:updateTargetAlly()
+    if #enemies == 0 then
+    return 
+    end
   if self.target ~= nil and self.target.hp <= 0 then
     self.target = nil
   end

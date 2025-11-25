@@ -1,10 +1,12 @@
 ShopClass = {}
 ShopClass.__index = ShopClass 
 
-function ShopClass:new(slotNumber, windowWidth, windowHeight)
+function ShopClass:new(slotNumber,piece,windowWidth, windowHeight)
     local shop = setmetatable({}, ShopClass)
     shop.width = windowWidth * 0.20       -- 20% of window width
-    shop.height = 120                    -- fixed height
+    shop.height = 120 
+    shop.piece = piece
+    shop.slot =slotNumber
     shop.x = (slotNumber - 1) * shop.width  -- position based on slot number (0-indexed internally)
     shop.y = windowHeight - shop.height  -- bottom aligned
     return shop
