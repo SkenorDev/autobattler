@@ -106,4 +106,13 @@ function loadLevel(level)
 
     maxPieces = level.pieceLimit or 0
     usedPieces = 0
+    
+    gameState = "placement"
+    placementPhase = true
+    battlePhase = false
+    usedPieces = 0
+
 end
+
+
+

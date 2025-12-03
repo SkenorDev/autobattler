@@ -22,8 +22,8 @@ function PieceClass:new(x, y,range,attack,hp,team,name)
     local piece = setmetatable({}, PieceClass)
      piece.x=x
      piece.y=y
-     piece.scaleX = 0.025
-     piece.scaleY = 0.025
+     piece.scaleX = 0.6
+     piece.scaleY = 0.6
      piece.range=range
       piece.attack=attack
      piece.team = team

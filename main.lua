@@ -11,8 +11,31 @@ require "levelManager"
 
 io.stdout:setvbuf("no")
 
+-- === GLOBALS FOR GAME FLOW ===
 gameState = "menu"
 
+-- Placement / Battle phases inside the "game" state
+placementPhase = true     -- Player placing units / editing
+battlePhase = false       -- AI movement + attacks
+
+-- Track shop selection
+selectedPieceType = nil
+
+-- Piece selected on board (for move/remove)
+selectedPlacedPiece = nil
+
+-- Unit stats display
+unitStats = {
+    Warrior = { hp = 500, atk = 25, range = 1 },
+    Archer  = { hp = 350, atk = 30, range = 5 },
+    Tank    = { hp = 800, atk = 10, range = 1 },
+}
+
+UI = {
+    shopButtonWidth = 100,
+    shopButtonHeight = 50,
+    shopStatSpacing = 12,   -- vertical spacing between stat lines
+}
 
 function love.load()
   love.window.setTitle("TFT RIPOFF I THINK?")
@@ -37,48 +60,56 @@ function love.load()
   createShop(3,spawnArcher,"Archer")
   createShop(5,spawnTank,"Tank")
   
-  local level = levels[currentLevelIndex]
-  loadLevel(level)
+  --local level = levels[currentLevelIndex]
+  --loadLevel(level)
 
 end
 local timeAccumulator = 0
 
 
 function love.update(dt)
-  timeAccumulator = timeAccumulator + dt
 
-  if timeAccumulator >= 2 then
-    -- Run your once-per-second logic:
-    for i, ally in ipairs(allies) do
-      ally:update()
-    end
-    for i, enemy in ipairs(enemies) do
-      enemy:update()
-    end
-    for i, ally in ipairs(allies) do
-      action(ally)
-    end
-    for i, enemy in ipairs(enemies) do
-      action(enemy)
-    end
-    for i = #allies, 1, -1 do
-    local ally = allies[i]
-      if ally.hp <= 0 then
-        table.remove(allies, i)
-        -- free the hex
-        hexGrid[ally.x][ally.y].occupied = false
+  if gameState == "game" and battlePhase == true then
+      timeAccumulator = timeAccumulator + dt
+      if timeAccumulator >= 2 then
+
+          -- Run unit updates
+          for i, ally in ipairs(allies) do
+              ally:update()
+          end
+          for i, enemy in ipairs(enemies) do
+              enemy:update()
+          end
+
+          -- Run actions
+          for i, ally in ipairs(allies) do
+              action(ally)
+          end
+          for i, enemy in ipairs(enemies) do
+              action(enemy)
+          end
+
+          -- Death cleanup
+          for i = #allies, 1, -1 do
+              local ally = allies[i]
+              if ally.hp <= 0 then
+                  hexGrid[ally.x][ally.y].occupied = false
+                  table.remove(allies, i)
+              end
+          end
+
+          for i = #enemies, 1, -1 do
+              local enemy = enemies[i]
+              if enemy.hp <= 0 then
+                  hexGrid[enemy.x][enemy.y].occupied = false
+                  table.remove(enemies, i)
+              end
+          end
+
+          timeAccumulator = timeAccumulator - 1
       end
-    end
-    for i = #enemies, 1, -1 do
-      local enemy = enemies[i]
-      if enemy.hp <= 0 then
-        table.remove(enemies, i)
-        -- free the hex
-        hexGrid[enemy.x][enemy.y].occupied = false
-      end
-    end
-    timeAccumulator = timeAccumulator - 1
   end
+
   -- WIN CONDITION:
   -- No enemies left
   if gameState == "game" and #enemies == 0 then
@@ -102,15 +133,23 @@ function love.update(dt)
 end
 
 -- Helper funtions
-function drawButton(text, x, y, w, h)
-    love.graphics.setColor(0.8, 0.8, 0.8)
+function drawButton(text, x, y, w, h, highlight)
+    -- Background
+    if highlight then
+        love.graphics.setColor(1, 1, 0.4)  -- yellowish highlight
+    else
+        love.graphics.setColor(0.8, 0.8, 0.8)
+    end
+
     love.graphics.rectangle("fill", x, y, w, h, 8, 8)
 
+    -- Text
     love.graphics.setColor(0, 0, 0)
     love.graphics.printf(text, x, y + h/3, w, "center")
 
     love.graphics.setColor(1, 1, 1)
 end
+
 
 function isInside(x, y, bx, by, bw, bh)
     return x > bx and x < bx + bw and y > by and y < by + bh
@@ -181,6 +220,14 @@ function love.draw()
     ---------------------------------------------------
     -- GAMEPLAY DRAW SECTION
     ---------------------------------------------------
+    
+    -- READY button appears only during placement
+    if gameState == "placement" then
+        drawButton("READY", 250, 10, 100, 40)
+    end
+
+
+
     local mouseX, mouseY = love.mouse.getPosition()
     love.graphics.setColor(0, 0, 0)
     love.graphics.print("Mouse: " .. mouseX .. ", " .. mouseY, 10, 10)
@@ -199,8 +246,42 @@ function love.draw()
     for _, enemy in ipairs(enemies) do
         enemy:draw()
     end
+    ---------------------------------------------------
+    -- SHOP DRAW + HIGHLIGHT + STATS
+    ---------------------------------------------------
     for _, shop in ipairs(shops) do
-        shop:draw()
+        local isSelected = (selectedPieceType == shop.name)
+
+        -- Draw button with global UI sizing
+        drawButton(
+            shop.name,
+            shop.x,
+            shop.y,
+            UI.shopButtonWidth,
+            UI.shopButtonHeight,
+            isSelected
+        )
+
+        -- Draw stats underneath button
+        local stats = unitStats[shop.name]
+        if stats then
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.print("HP: " .. stats.hp,
+                shop.x + 10,
+                shop.y + UI.shopButtonHeight + 5
+            )
+            love.graphics.print("ATK: " .. stats.atk,
+                shop.x + 10,
+                shop.y + UI.shopButtonHeight + 5 + UI.shopStatSpacing
+            )
+            love.graphics.print("RNG: " .. stats.range,
+                shop.x + 10,
+                shop.y + UI.shopButtonHeight + 5 + UI.shopStatSpacing * 2
+            )
+            love.graphics.setColor(1, 1, 1)
+        end
     end
+
+
 end
 

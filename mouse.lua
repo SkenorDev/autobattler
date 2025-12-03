@@ -9,14 +9,26 @@ local yGridEnd = 470
 local HEX_WIDTH = 60
 local HEX_HEIGHT = 70
 
+
 function love.mousereleased(x, y, button)
+  -- READY BUTTON CLICK
+  if gameState == "placement" and button == 1 then
+      if isInside(x, y, 250, 10, 100, 40) then
+          gameState = "game"
+          battlePhase = true
+          timeAccumulator = 0   -- ensures no speed jump
+          print(">>> BATTLE STARTED!")
+          return
+      end
+  end
+
   
   -- MAIN MENU BUTTON LOGIC
   if gameState == "menu" and button == 1 then
       if isInside(x, y, screenWidth/2 - 100, 250, 200, 60) then
           -- Start Game → always Level 1
           currentLevelIndex = 1
-          gameState = "game"
+          --gameState = "placement"
           loadLevel(levels[currentLevelIndex])
           return
       end
@@ -33,7 +45,7 @@ function love.mousereleased(x, y, button)
       for i, level in ipairs(levels) do
           if isInside(x, y, screenWidth/2 - 100, yPos, 200, 50) then
               currentLevelIndex = i
-              gameState = "game"
+              --gameState = "placement"
               loadLevel(level)
               return
           end
@@ -65,7 +77,7 @@ function love.mousereleased(x, y, button)
               return
           end
 
-          gameState = "game"
+          gameState = "placement"
           loadLevel(levels[currentLevelIndex])
           return
       end
@@ -81,7 +93,7 @@ function love.mousereleased(x, y, button)
 
       -- Try Again (reload same level)
       if isInside(x, y, screenWidth/2 - 100, 330, 200, 60) then
-          gameState = "game"
+          gameState = "placement"
           loadLevel(levels[currentLevelIndex])
           return
       end
