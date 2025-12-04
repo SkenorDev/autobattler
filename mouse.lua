@@ -9,6 +9,10 @@ local yGridEnd = 470
 local HEX_WIDTH = 60
 local HEX_HEIGHT = 70
 
+screenWidth = 600
+screenHeight = 600
+
+
 
 function love.mousereleased(x, y, button)
   -- READY BUTTON CLICK
@@ -37,6 +41,12 @@ function love.mousereleased(x, y, button)
           gameState = "level_select"
           return
       end
+      -- Upgrades button
+      if isInside(x, y, screenWidth/2 - 100, 450, 200, 60) then
+          gameState = "upgrade_screen"
+          return
+      end
+
   end
 
   -- LEVEL SELECT BUTTON LOGIC
@@ -58,6 +68,8 @@ function love.mousereleased(x, y, button)
           return
       end
   end
+  
+  
 
   -- WIN SCREEN BUTTONS
   if gameState == "win" and button == 1 then
@@ -98,6 +110,46 @@ function love.mousereleased(x, y, button)
           return
       end
   end
+  
+-- UPGRADE SCREEN CLICKS
+if gameState == "upgrade_screen" and button == 1 then
+    local pieces = {"Warrior", "Archer", "Tank"}
+    local bx = 100      -- button x
+    local by = 180      -- starting y
+    local spacing = 150
+
+    for _, piece in ipairs(pieces) do
+        local level = pieceLevels[piece]
+
+        -- Upgrade button
+        local upX = bx
+        local upY = by + 70
+        local upW = 200
+        local upH = 40
+
+        if level < 3 and isInside(x, y, upX, upY, upW, upH) then
+            if upgradeTokens >= 1 then
+                upgradeTokens = upgradeTokens - 1
+                pieceLevels[piece] = pieceLevels[piece] + 1
+                print("Upgraded:", piece, "to level", pieceLevels[piece])
+            end
+        end
+
+        by = by + spacing
+    end
+
+    -- BACK BUTTON
+    local backX = screenWidth - 200
+    local backY = screenHeight - 100
+
+    if isInside(x, y, backX, backY, 200, 50) then
+        gameState = "menu"
+    end
+
+    return
+end
+
+
 
     
   print("Mouse released at:", x, y, "button:", button)

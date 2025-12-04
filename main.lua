@@ -14,6 +14,28 @@ io.stdout:setvbuf("no")
 -- === GLOBALS FOR GAME FLOW ===
 gameState = "menu"
 
+upgradeTokens = 0
+
+rewardGiven = false
+
+
+pieceLevels = {
+    Warrior = 1,
+    Archer = 1,
+    Tank = 1
+}
+
+-- Base stats for each piece
+baseStats = {
+    Warrior = { hp = 500, atk = 25, range = 1 },
+    Archer  = { hp = 350, atk = 30, range = 5 },
+    Tank    = { hp = 800, atk = 10, range = 1 },
+}
+
+-- Growth multiplier
+upgradeMultiplier = 1.15
+
+
 -- Placement / Battle phases inside the "game" state
 placementPhase = true     -- Player placing units / editing
 battlePhase = false       -- AI movement + attacks
@@ -24,21 +46,31 @@ selectedPieceType = nil
 -- Piece selected on board (for move/remove)
 selectedPlacedPiece = nil
 
--- Unit stats display
-unitStats = {
-    Warrior = { hp = 500, atk = 25, range = 1 },
-    Archer  = { hp = 350, atk = 30, range = 5 },
-    Tank    = { hp = 800, atk = 10, range = 1 },
-}
-
 UI = {
     shopButtonWidth = 100,
     shopButtonHeight = 50,
     shopStatSpacing = 12,   -- vertical spacing between stat lines
 }
 
+--Just to place here for now:
+function getUpgradedStats(pieceName)
+    local level = pieceLevels[pieceName]
+    local base = baseStats[pieceName]
+
+    -- scale stats based on 15% increase per level
+    local hp = math.floor(base.hp * (upgradeMultiplier ^ (level - 1)))
+    local atk = math.floor(base.atk * (upgradeMultiplier ^ (level - 1)))
+
+    return {
+        hp = hp,
+        atk = atk,
+        range = base.range
+    }
+end
+
+
 function love.load()
-  love.window.setTitle("TFT RIPOFF I THINK?")
+  love.window.setTitle("ARKDIG")
   screenWidth = 600
   screenHeight = 600
   love.window.setMode(screenWidth, screenHeight)
@@ -48,6 +80,17 @@ function love.load()
   yGridEnd = 470
   xGridStart=60
   xGridEnd=560
+  
+  musicMenu = love.audio.newSource("Assets/music_menu.mp3", "stream")
+  musicBattle = love.audio.newSource("Assets/music_battle.mp3", "stream")
+
+  musicMenu:setLooping(true)
+  musicBattle:setLooping(true)
+
+  -- Start menu music by default
+  love.audio.play(musicMenu)
+
+  
   -- makes hexGrid table
   makeGrid(radius)
   shops={}
@@ -60,16 +103,31 @@ function love.load()
   createShop(3,spawnArcher,"Archer")
   createShop(5,spawnTank,"Tank")
   
+  
+  boardBG = love.graphics.newImage("Assets/BoardBG.png")
+
+  
   --local level = levels[currentLevelIndex]
   --loadLevel(level)
 
 end
 local timeAccumulator = 0
 
+function switchMusic(target)
+    if target == "menu" then
+        if musicBattle:isPlaying() then musicBattle:stop() end
+        if not musicMenu:isPlaying() then musicMenu:play() end
+    elseif target == "battle" then
+        if musicMenu:isPlaying() then musicMenu:stop() end
+        if not musicBattle:isPlaying() then musicBattle:play() end
+    end
+end
+
 
 function love.update(dt)
 
   if gameState == "game" and battlePhase == true then
+      rewardGiven = false
       timeAccumulator = timeAccumulator + dt
       if timeAccumulator >= 2 then
 
@@ -108,11 +166,22 @@ function love.update(dt)
 
           timeAccumulator = timeAccumulator - 1
       end
+      -- MUSIC STATE CONTROL
+      if gameState == "game" then
+          switchMusic("battle")
+      else
+          switchMusic("menu")
+      end
+
   end
 
   -- WIN CONDITION:
   -- No enemies left
   if gameState == "game" and #enemies == 0 then
+      if not rewardGiven then
+          upgradeTokens = upgradeTokens + 2
+          rewardGiven = true
+      end
       gameState = "win"
       return
   end
@@ -134,26 +203,44 @@ end
 
 -- Helper funtions
 function drawButton(text, x, y, w, h, highlight)
-    -- Background
     if highlight then
-        love.graphics.setColor(1, 1, 0.4)  -- yellowish highlight
+        -- Bright gold highlight
+        love.graphics.setColor(1, 0.85, 0)
     else
+        -- Normal gray
         love.graphics.setColor(0.8, 0.8, 0.8)
     end
 
     love.graphics.rectangle("fill", x, y, w, h, 8, 8)
 
-    -- Text
+    -- Button outline for clarity
     love.graphics.setColor(0, 0, 0)
-    love.graphics.printf(text, x, y + h/3, w, "center")
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", x, y, w, h, 8, 8)
 
+    -- Text
+    love.graphics.printf(text, x, y + h/3, w, "center")
     love.graphics.setColor(1, 1, 1)
 end
+
 
 
 function isInside(x, y, bx, by, bw, bh)
     return x > bx and x < bx + bw and y > by and y < by + bh
 end
+
+
+function drawUIBox(x, y, w, h, alpha)
+    love.graphics.setColor(1, 1, 1, alpha or 0.8)
+    love.graphics.rectangle("fill", x, y, w, h, 6, 6)
+
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", x, y, w, h, 6, 6)
+
+    love.graphics.setColor(1, 1, 1, 1) -- reset color
+end
+
 
 
 -- draw function
@@ -165,10 +252,11 @@ function love.draw()
     ---------------------------------------------------
     if gameState == "menu" then
         love.graphics.setColor(0,0,0)
-        love.graphics.printf("TFT RIPOFF", 0, 100, screenWidth, "center")
+        love.graphics.printf("ARKDIG", 0, 100, screenWidth, "center")
 
         drawButton("Start Game", screenWidth/2 - 100, 250, 200, 60)
         drawButton("Level Select", screenWidth/2 - 100, 350, 200, 60)
+        drawButton("Upgrades", screenWidth/2 - 100, 450, 200, 60)
         return
     end
 
@@ -218,17 +306,63 @@ function love.draw()
     end
 
     ---------------------------------------------------
+    -- UPGRADE SCREEN
+    ---------------------------------------------------
+    if gameState == "upgrade_screen" then
+        love.graphics.setColor(0,0,0)
+        love.graphics.printf("UPGRADES", 0, 50, screenWidth, "center")
+
+        love.graphics.printf("Tokens: " .. upgradeTokens, 0, 100, screenWidth, "center")
+
+        local x = 100
+        local y = 180
+        local spacing = 150
+
+        local pieces = {"Warrior", "Archer", "Tank"}
+
+        for i, piece in ipairs(pieces) do
+            local level = pieceLevels[piece]
+            local current = getUpgradedStats(piece)
+
+            drawButton(piece .. " Lv." .. level, x, y, 200, 60)
+
+            love.graphics.print("HP: " .. current.hp, x + 220, y + 5)
+            love.graphics.print("ATK: " .. current.atk, x + 220, y + 25)
+            love.graphics.print("RNG: " .. current.range, x + 220, y + 45)
+
+            -- Upgrade button appears if below level 3
+            if level < 3 then
+                drawButton("Upgrade", x, y + 70, 200, 40)
+            end
+
+            y = y + spacing
+        end
+
+        drawButton("Back", screenWidth-200, screenHeight - 100, 200, 50)
+
+        return
+    end
+
+    ---------------------------------------------------
     -- GAMEPLAY DRAW SECTION
     ---------------------------------------------------
-    
+    -- Draw board background
+    -- FULLSCREEN BACKGROUND
+    love.graphics.setColor(1, 1, 1)
+    local bgw = boardBG:getWidth()
+    local bgh = boardBG:getHeight()
+    local sx = screenWidth / bgw
+    local sy = screenHeight / bgh
+    love.graphics.draw(boardBG, 0, 0, 0, sx, sy)
+
     -- READY button appears only during placement
     if gameState == "placement" then
         drawButton("READY", 250, 10, 100, 40)
     end
 
-
-
     local mouseX, mouseY = love.mouse.getPosition()
+    -- UI background panel for debug + pieces
+    drawUIBox(5, 5, 150, 50, 0.7)
     love.graphics.setColor(0, 0, 0)
     love.graphics.print("Mouse: " .. mouseX .. ", " .. mouseY, 10, 10)
     love.graphics.print("Pieces: " .. usedPieces .. " / " .. maxPieces, 10, 30)
@@ -247,12 +381,12 @@ function love.draw()
         enemy:draw()
     end
     ---------------------------------------------------
-    -- SHOP DRAW + HIGHLIGHT + STATS
+    -- SHOP DRAW (buttons + highlight + stats)
     ---------------------------------------------------
     for _, shop in ipairs(shops) do
         local isSelected = (selectedPieceType == shop.name)
 
-        -- Draw button with global UI sizing
+        -- Draw shop button with highlight
         drawButton(
             shop.name,
             shop.x,
@@ -262,25 +396,31 @@ function love.draw()
             isSelected
         )
 
-        -- Draw stats underneath button
-        local stats = unitStats[shop.name]
+        -- Draw stats (under each button)
+        local stats = getUpgradedStats(shop.name)
+
         if stats then
-            love.graphics.setColor(0, 0, 0)
-            love.graphics.print("HP: " .. stats.hp,
-                shop.x + 10,
-                shop.y + UI.shopButtonHeight + 5
-            )
-            love.graphics.print("ATK: " .. stats.atk,
-                shop.x + 10,
-                shop.y + UI.shopButtonHeight + 5 + UI.shopStatSpacing
-            )
-            love.graphics.print("RNG: " .. stats.range,
-                shop.x + 10,
-                shop.y + UI.shopButtonHeight + 5 + UI.shopStatSpacing * 2
-            )
-            love.graphics.setColor(1, 1, 1)
+          -- Background for stats
+          drawUIBox(shop.x - 5, shop.y + UI.shopButtonHeight + 2, 110, 70, 0.7)
+
+          love.graphics.setColor(0, 0, 0)
+          love.graphics.print("HP:  " .. stats.hp,
+              shop.x + 5,
+              shop.y + UI.shopButtonHeight + 10
+          )
+          love.graphics.print("ATK: " .. stats.atk,
+              shop.x + 5,
+              shop.y + UI.shopButtonHeight + 10 + UI.shopStatSpacing
+          )
+          love.graphics.print("RNG: " .. stats.range,
+              shop.x + 5,
+              shop.y + UI.shopButtonHeight + 10 + UI.shopStatSpacing * 2
+          )
+          love.graphics.setColor(1, 1, 1)
+
         end
     end
+
 
 
 end
